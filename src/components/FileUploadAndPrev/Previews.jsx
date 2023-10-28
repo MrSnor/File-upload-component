@@ -83,6 +83,7 @@ export function Previews({ files, setFiles }) {
       animate="visible"
       exit="exit"
       variants={dropIn}
+      layout
     >
       <div className={cn("flex min-w-0 overflow-hidden")}>
         <img
