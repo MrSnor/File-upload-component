@@ -1,10 +1,12 @@
 import { Previews } from "@/components/FileUploadAndPrev/Previews";
 import { cn } from "@/lib/utils";
+import axios from "axios";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
 
 const FileUpload = (props) => {
   const [files, setFiles] = useState([]);
+  const [imageSent, setImageSent] = useState([]);
 
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
@@ -27,8 +29,61 @@ const FileUpload = (props) => {
       },
     });
 
+  const uploadFiles = async () => {
+    const formData = new FormData();
+    console.log(files);
+    formData.append("image", files);
+    formData.append("key", import.meta.env.VITE_IMGBB_KEY);
+    // set expiration for image upload
+    formData.append("expiration", 100);
+
+    try {
+      const response = await axios.post(
+        "https://api.imgbb.com/1/upload",
+        formData,
+      );
+      console.log(response.data);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // upload all files using foreach
+  const uploadAllFiles = async () => {
+    console.log("upload all files clicked");
+    files.forEach(async (file) => {
+      const formData = new FormData();
+      formData.append("image", file);
+      formData.append("key", import.meta.env.VITE_IMGBB_KEY);
+      // set expiration for image upload
+      formData.append("expiration", 100);
+      try {
+        const response = await axios.post(
+          "https://api.imgbb.com/1/upload",
+          formData,
+        );
+        console.log(response.data);
+        // add response to imageSent array
+        setImageSent((prevImageSent) => [...prevImageSent, response.data]);
+      } catch (error) {
+        console.error(error);
+      }
+    });
+  };
+
   return (
     <div className="group container overflow-y-hidden">
+      {/* button to upload files */}
+      <button
+        type="button"
+        className="mx-auto my-4 block rounded border border-blue-500 p-1 text-blue-500 transition-colors hover:bg-blue-500 hover:text-white"
+        onClick={() => {
+          uploadAllFiles();
+          console.log(files);
+        }}
+      >
+        Upload
+      </button>
       {/* button to reset files list */}
       <button
         type="button"
@@ -71,8 +126,43 @@ const FileUpload = (props) => {
         </svg>
         <p>Drag 'n' drop some files here, or click to select files</p>
       </div>
-      <Previews files={files} setFiles={setFiles} />{" "}
       {/* Use the Previews component */}
+      <Previews files={files} setFiles={setFiles} />{" "}
+      {/* show uploaded files with link and thumbnails */}
+      <div className="mt-4 grid grid-cols-2 gap-5 space-y-2">
+        {imageSent.map((image) => (
+          <div
+            className="flex items-center justify-between gap-2 text-black"
+            key={image.data.url}
+          >
+            <img
+              src={image.data.thumb.url}
+              alt="uploaded image"
+              className="aspect-video"
+            />
+            <p>{image.data.url}</p>
+            <a
+              href={image.data.url_viewer}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+                strokeWidth="1.5"
+                className="h-6 w-6 stroke-blue-600"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25"
+                />
+              </svg>
+            </a>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
