@@ -24,6 +24,10 @@ export function Previews({ files, setFiles }) {
     exit: {
       y: "100vh",
       opacity: 0,
+      transition: {
+        duration: 0.25,
+        ease: "easeOut",
+      },
     },
   };
 
@@ -78,7 +82,7 @@ export function Previews({ files, setFiles }) {
       initial="hidden"
       animate="visible"
       exit="exit"
-      variants={scaleUp}
+      variants={dropIn}
     >
       <div className={cn("flex min-w-0 overflow-hidden")}>
         <img
