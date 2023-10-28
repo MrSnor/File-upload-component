@@ -1,13 +1,39 @@
 import { Previews } from "@/components/FileUploadAndPrev/Previews";
 import { cn } from "@/lib/utils";
 import axios from "axios";
+import { AnimatePresence, motion } from "framer-motion";
+import { Loader2 } from "lucide-react";
 import { useState } from "react";
 import { useDropzone } from "react-dropzone";
+
+const scaleUp = {
+  hidden: {
+    opacity: 0,
+    scale: 0,
+  },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.2,
+      ease: "easeIn",
+    },
+  },
+  exit: {
+    opacity: 0,
+    scale: 0,
+    transition: {
+      duration: 0.15,
+      ease: "easeOut",
+    },
+  },
+};
 
 const FileUpload = (props) => {
   const [files, setFiles] = useState([]);
   const [imageSent, setImageSent] = useState([]);
-
+  // loading state
+  const [isLoading, setIsLoading] = useState(false);
   const { getRootProps, getInputProps, isFocused, isDragAccept, isDragReject } =
     useDropzone({
       accept: { "image/*": [] },
@@ -27,6 +53,7 @@ const FileUpload = (props) => {
           ];
         });
       },
+      disabled: isLoading,
     });
 
   const uploadFiles = async () => {
@@ -51,6 +78,7 @@ const FileUpload = (props) => {
   // upload all files using foreach
   const uploadAllFiles = async () => {
     console.log("upload all files clicked");
+
     files.forEach(async (file) => {
       const formData = new FormData();
       formData.append("image", file);
@@ -58,10 +86,13 @@ const FileUpload = (props) => {
       // set expiration for image upload
       formData.append("expiration", 100);
       try {
+        setIsLoading(true);
+
         const response = await axios.post(
           "https://api.imgbb.com/1/upload",
           formData,
         );
+        setIsLoading(false);
         console.log(response.data);
         // add response to imageSent array
         setImageSent((prevImageSent) => [...prevImageSent, response.data]);
@@ -104,27 +135,51 @@ const FileUpload = (props) => {
           {
             "border-red-400": isDragReject,
           },
+          isLoading && "cursor-not-allowed opacity-50",
         )}
         {...getRootProps()}
       >
         <input {...getInputProps()} />
-        <svg
-          className="h-12 w-12"
-          fill="none"
-          height="24"
-          stroke="currentColor"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth="2"
-          viewBox="0 0 24 24"
-          width="24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
-          <path d="M12 12v9" />
-          <path d="m16 16-4-4-4 4" />
-        </svg>
-        <p>Drag 'n' drop some files here, or click to select files</p>
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={scaleUp}
+              key={"loading"}
+            >
+              <Loader2 className="mx-auto h-12 w-12 animate-spin" />
+              <p>Uploading {files.length} files...</p>
+            </motion.div>
+          ) : (
+            <motion.div
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              variants={scaleUp}
+              key={"dropzone"}
+            >
+              <svg
+                className="mx-auto h-12 w-12"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path d="M4 14.899A7 7 0 1 1 15.71 8h1.79a4.5 4.5 0 0 1 2.5 8.242" />
+                <path d="M12 12v9" />
+                <path d="m16 16-4-4-4 4" />
+              </svg>
+              <p>Drag 'n' drop some files here, or click to select files</p>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
       {/* Use the Previews component */}
       <Previews files={files} setFiles={setFiles} />{" "}
