@@ -11,6 +11,8 @@ const FileUpload = (props) => {
       accept: { "image/*": [] },
       onDrop: (acceptedFiles) => {
         setFiles((prevFiles) => {
+          /* filtering the `acceptedFiles` array to remove any files that already
+          exist in the `prevFiles` array. */
           const newFiles = acceptedFiles.filter((file) => {
             return !prevFiles.some((prevFile) => prevFile.name === file.name);
           });
