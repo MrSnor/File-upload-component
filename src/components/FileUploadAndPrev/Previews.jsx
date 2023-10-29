@@ -54,21 +54,6 @@ export function Previews({ files, setFiles }) {
     },
   };
 
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: { "image/*": [] },
-    onDrop: (acceptedFiles) => {
-      const updatedFiles = [
-        ...files,
-        ...acceptedFiles.map((file) =>
-          Object.assign(file, {
-            preview: URL.createObjectURL(file),
-          }),
-        ),
-      ];
-      setFiles(updatedFiles);
-    },
-  });
-
   useEffect(() => {
     return () => files.forEach((file) => URL.revokeObjectURL(file.preview));
   }, [files]);
@@ -105,23 +90,6 @@ export function Previews({ files, setFiles }) {
         }}
       >
         <Trash className="aspect-square w-4" />
-        {/* <svg
-              className=" w-4 h-4 text-white"
-              fill="none"
-              height="24"
-              stroke="currentColor"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              width="24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <rect height="18" rx="2" ry="2" width="18" x="3" y="3" />
-              <line x1="3" x2="21" y1="9" y2="9" />
-              <path d="m9 16 3-3 3 3" />
-            </svg>
-            <span className="sr-only">Remove File</span> */}
       </button>
     </motion.div>
   ));
