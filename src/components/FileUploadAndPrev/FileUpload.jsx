@@ -84,7 +84,7 @@ const FileUpload = (props) => {
       formData.append("image", file);
       formData.append("key", import.meta.env.VITE_IMGBB_KEY);
       // set expiration for image upload
-      formData.append("expiration", 100);
+      // formData.append("expiration", 100);
       try {
         setIsLoading(true);
 
@@ -184,10 +184,14 @@ const FileUpload = (props) => {
       {/* Use the Previews component */}
       <Previews files={files} setFiles={setFiles} />{" "}
       {/* show uploaded files with link and thumbnails */}
-      <div className="mt-4 grid grid-cols-2 gap-5 space-y-2">
+      <div className="mt-4 grid grid-cols-1 gap-5 space-y-2 md:grid-cols-2">
+        {imageSent.length > 0 && (
+          <p className="col-span-full py-3 text-center">Uploaded Files</p>
+        )}
+
         {imageSent.map((image) => (
           <div
-            className="flex items-center justify-between gap-2 text-black"
+            className="flex flex-col items-center justify-between gap-2 text-black md:flex-row"
             key={image.data.url}
           >
             <img
