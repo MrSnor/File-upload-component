@@ -39,7 +39,7 @@ const FileUpload = (props) => {
       </button>
       <div
         className={cn(
-          "flex cursor-pointer flex-col items-center rounded border-2 border-dashed border-gray-400 bg-gray-100 p-5 py-32 text-gray-500 outline-none transition-colors duration-200 ease-in-out hover:border-gray-700 group-hover:text-gray-700",
+          "dropzone-area",
           {
             "border-blue-400": isFocused,
           },
