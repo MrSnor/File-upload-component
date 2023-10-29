@@ -1,13 +1,43 @@
+import { gsap } from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { useLayoutEffect, useRef } from "react";
+
+gsap.registerPlugin(ScrollTrigger);
+
 export const UploadedFiles = ({ imageSent }) => {
+  const main = useRef(null);
+  useLayoutEffect(() => {
+    const ctx = gsap.context((self) => {
+      const boxes = self.selector(".box");
+      gsap.from(boxes, {
+        x: -200, // Start from left (-100px)
+        opacity: 0,
+        duration: 1,
+        stagger: 0.4, // Add stagger effect for sequential animation
+        scrollTrigger: {
+          trigger: main.current,
+          start: "top 80%", // Adjust the start position for the effect
+          end: "bottom 100%", // Adjust the end position for the effect
+          scrub: true,
+        },
+      });
+    }, main); // <- Scope!
+    return () => ctx.revert(); // <- Cleanup!
+  }, [imageSent]);
+
+  console.log({ imageSent });
   return (
-    <div className="mt-4 grid grid-cols-1 gap-5 space-y-2 md:grid-cols-2">
+    <div
+      className="mt-4 grid grid-cols-1 gap-5 space-y-2 md:grid-cols-2"
+      ref={main}
+    >
       {imageSent.length > 0 && (
         <p className="col-span-full py-3 text-center">Uploaded Files</p>
       )}
 
       {imageSent.map((image) => (
         <div
-          className="flex flex-col items-center justify-between gap-2 text-black md:flex-row"
+          className="box flex flex-col items-center justify-between gap-2 text-black md:flex-row"
           key={image.data.url}
         >
           <img
