@@ -95,7 +95,14 @@ export function Previews({ files, setFiles }) {
   ));
 
   return (
-    <aside className={cn("grid grid-cols-6 py-2")}>
+    <aside
+      className={cn(
+        "grid grid-cols-1 py-2 sm:grid-cols-2 md:grid-cols-4 lg:grid-cols-6",
+      )}
+    >
+      {files.length > 0 && (
+        <p className="col-span-full py-3 text-center">Preview</p>
+      )}
       <AnimatePresence initial={false} mode="sync">
         {thumbs}
       </AnimatePresence>

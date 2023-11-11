@@ -11,7 +11,7 @@ function App() {
 
   return (
     // code inside this div as root entry of your app
-    <div className="App min-h-screen space-y-4 p-8 text-center text-white">
+    <div className="App min-h-screen space-y-4 p-8 text-center">
       <FileUpload />
     </div>
   );
